@@ -60,14 +60,14 @@ for variant in variants:
 print("")
 print("Covid")
 for variant in variants:
-    print(variant, times[variant]["covid"]["+"], times[variant]["covid"]["-"])
+    print(variant, times[variant]["covid"]["+"], mems[variant]["covid"]["-"])
 
 print("")
 print("Ecoli")
 for variant in variants:
-    print(variant, times[variant]["ecoli"]["+"], times[variant]["ecoli"]["-"])
+    print(variant, times[variant]["ecoli"]["+"], mems[variant]["ecoli"]["-"])
 
 print("")
 print("Metagenome")
 for variant in variants:
-    print(variant, times[variant]["metagenome"]["+"], times[variant]["metagenome"]["-"])
+    print(variant, times[variant]["metagenome"]["+"], mems[variant]["metagenome"]["-"])

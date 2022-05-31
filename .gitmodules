@@ -1,0 +1,9 @@
+[submodule "SBWT"]
+	path = SBWT
+	url = https://github.com/algbio/SBWT
+[submodule "cuttlefish"]
+	path = cuttlefish
+	url = https://github.com/COMBINE-lab/cuttlefish
+[submodule "sshash"]
+	path = sshash
+	url = https://github.com/jermp/sshash

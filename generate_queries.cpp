@@ -99,6 +99,7 @@ int main(int argc, char** argv) {
 
     options.add_options()
         ("o,out-file", "Output filename.", cxxopts::value<string>())
+        ("s,sample-from-source", "Sample k-mers from the gives fasta/fastq file.", cxxopts::value<string>()->default_value(""))
         ("i,index-file", "The plain-matrix SBWT index. If not given, uniform random k-mers are generated. If this is given, the -k option must be given", cxxopts::value<string>()->default_value(""))
         ("n,howmany", "Number of k-mers to generate", cxxopts::value<LL>())
         ("k", "The k of the k-mers. Needed if dbg-file is not given.", cxxopts::value<LL>()->default_value("-1"))
@@ -115,11 +116,32 @@ int main(int argc, char** argv) {
 
     string out_file = opts["out-file"].as<string>();
     string index_file = opts["index-file"].as<string>();
+    string source_file = opts["sample-from-source"].as<string>();
     LL howmany = opts["howmany"].as<LL>();
     LL k = opts["k"].as<LL>();
   
     sbwt::throwing_ofstream out(out_file, ios::binary);
-    if(index_file == ""){
+    if(source_file != ""){
+        if(k == -1){
+            cerr << "k not given" << endl;
+            return 1;
+        }
+        vector<string> seqs;
+        sbwt::SeqIO::Reader<> reader(source_file);
+        while(true){
+            LL len = reader.get_next_read_to_buffer();
+            if(len == 0) break;
+            seqs.push_back(string(reader.read_buf));
+        }
+        while(howmany > 0){
+            const string& seq = seqs[rand() % seqs.size()];
+            if(seq.size() < k) continue; // Too short
+            LL start = rand() % (seq.size() - k + 1);
+            out.stream << ">\n" << seq.substr(start,k) << "\n";
+            howmany--;
+        }
+    }
+    else if(index_file == ""){
         if(k == -1){
             cerr << "k not given" << endl;
             return 1;

@@ -7,20 +7,24 @@ import signal
 import random
 from multiprocessing import Pool
 
-#datasets = {"covid": "~/data/covid/ncbi_dataset/data/genomic.fna",
-#            "ecoli": "~/data/coli3682_concat.fasta",
-#            "metagenome": "~/data/ERR5035349.fastq"}
+if "--small" in sys.argv:
+    datasets = {"covid": "./smalldata/1.fna",
+                "ecoli": "./smalldata/2.fna",
+                "metagenome": "./smalldata/3.fna"}
+    unitig_dir = "./unitigs_small"
+    index_dir = "./index_small"
+else:
+    datasets = {"covid": "~/data/covid/ncbi_dataset/data/genomic.fna",
+                "ecoli": "~/data/coli3682_concat.fasta",
+                "metagenome": "~/data/ERR5035349.fastq"}
+    unitig_dir = "./unitigs"
+    index_dir = "./index"
 
-datasets = {"covid": "./smalldata/1.fna",
-            "ecoli": "./smalldata/2.fna",
-            "metagenome": "./smalldata/3.fna"}
 
 k = 31
 n_threads = 8
 temp_dir = "./temp"
-#unitig_dir = "./unitigs"
-unitig_dir = "./unitigs_small"
-index_dir = "./index"
+
 
 if sys.version_info < (3, 0):
     sys.stdout.write("Error: Python3 required\n")

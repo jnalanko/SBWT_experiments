@@ -7,3 +7,6 @@
 [submodule "sshash"]
 	path = sshash
 	url = https://github.com/jermp/sshash
+[submodule "bcalm"]
+	path = bcalm
+	url = https://github.com/GATB/bcalm

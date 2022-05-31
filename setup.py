@@ -7,13 +7,13 @@ import signal
 import random
 from multiprocessing import Pool
 
-#datasets = {"covid": "~/data/covid/ncbi_dataset/data/genomic.fna",
-#            "ecoli": "~/data/coli3682_concat.fasta",
-#            "metagenome": "~/data/covid/ncbi_dataset/data/ERR5035349.fastq"}
+datasets = {"covid": "~/data/covid/ncbi_dataset/data/genomic.fna",
+            "ecoli": "~/data/coli3682_concat.fasta",
+            "metagenome": "~/data/covid/ncbi_dataset/data/ERR5035349.fastq"}
 
-datasets = {"covid": "./smalldata/1.fna",
-            "ecoli": "./smalldata/2.fna",
-            "metagenome": "./smalldata/3.fna"}
+#datasets = {"covid": "./smalldata/1.fna",
+#            "ecoli": "./smalldata/2.fna",
+#            "metagenome": "./smalldata/3.fna"}
 
 k = 31
 n_threads = 8

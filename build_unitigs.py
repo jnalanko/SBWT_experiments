@@ -11,14 +11,16 @@ def run_cuttlefish():
 
     for D in datasets:
         f = datasets[D]
-        run("./cuttlefish/build/src/cuttlefish build -s {} -k {} -t {} -o {} -w {}".format(
-            f, k, n_threads, unitig_dir + "/" + D, tempdir))
+        logfile = unitig_dir + "/" + D + ".cuttlefish.log"
+        run("./cuttlefish/build/src/cuttlefish build -s {} -k {} -t {} -o {} -w {} 2>&1 | tee {}".format(
+            f, k, n_threads, unitig_dir + "/" + D, tempdir, logfile, logfile))
 
 def run_bcalm():
     for D in datasets:
         f = datasets[D]
-        run("bcalm/build/bcalm -in {} -kmer-size {} -abundance-min 1 -nb-cores {} -out {}".format(
-             f, k, n_threads, unitig_dir + "/" + D))
+        logfile = unitig_dir + "/" + D + ".bcalm.log"
+        run("/usr/bin/time --verbose bcalm/build/bcalm -in {} -kmer-size {} -abundance-min 1 -nb-cores {} -out {} 2>&1 | tee {}".format(
+             f, k, n_threads, unitig_dir + "/" + D, logfile, logfile))
 
 run_bcalm()
 

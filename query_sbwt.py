@@ -2,7 +2,7 @@ from setup import *
 
 print(datasets)  # Defined in setup.py
 
-variants = ["rrr-matrix", "mef-matrix", "plain-split", "rrr-split","mef-split", "plain-concat", "mef-concat", "plain-subsetwt", "rrr-subsetwt"]
+variants = ["plain-matrix", "rrr-matrix", "mef-matrix", "plain-split", "rrr-split","mef-split", "plain-concat", "mef-concat", "plain-subsetwt", "rrr-subsetwt"]
 
 for D in datasets:
     f = datasets[D]

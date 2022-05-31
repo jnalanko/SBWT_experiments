@@ -13,3 +13,6 @@
 [submodule "UST"]
 	path = UST
 	url = https://github.com/jermp/UST
+[submodule "bifrost"]
+	path = bifrost
+	url = https://github.com/pmelsted/bifrost

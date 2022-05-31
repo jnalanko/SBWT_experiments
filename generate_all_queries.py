@@ -10,10 +10,8 @@ if "--small" in sys.argv:
     n_streaming_queries = 10
     streaming_length = 40
 else:
-    n_streaming_queries = 10**5
+    n_streaming_queries = 10**6 // 500
     streaming_length = 500
-
-
 
 for D in datasets:
 

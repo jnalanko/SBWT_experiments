@@ -10,3 +10,6 @@
 [submodule "bcalm"]
 	path = bcalm
 	url = https://github.com/GATB/bcalm
+[submodule "UST"]
+	path = UST
+	url = https://github.com/jermp/UST

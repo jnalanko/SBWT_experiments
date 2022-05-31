@@ -83,6 +83,7 @@ void sample_random_kmers(sbwt::plain_matrix_sbwt_t& sbwt, LL howmany, string out
 
         if(!has_dollar){
             // Write out the label as a FASTA sequence
+            if(!sbwt.is_colex()) std::reverse(label.begin(), label.end());
             out.stream << ">\n";
             for(char c : label) out.stream << c;
             out.stream << "\n";

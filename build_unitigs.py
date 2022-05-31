@@ -13,7 +13,7 @@ def run_cuttlefish():
         f = datasets[D]
         logfile = unitig_dir + "/" + D + ".cuttlefish.log"
         run("./cuttlefish/build/src/cuttlefish build -s {} -k {} -t {} -o {} -w {} 2>&1 | tee {}".format(
-            f, k, n_threads, unitig_dir + "/" + D, tempdir, logfile))
+            f, k, n_threads, unitig_dir + "/" + D, temp_dir, logfile))
 
 def run_bcalm():
     for D in datasets:

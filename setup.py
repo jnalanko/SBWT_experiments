@@ -17,7 +17,7 @@ datasets = {"covid": "./smalldata/1.fna",
 
 k = 31
 n_threads = 8
-tempdir = "./temp"
+temp_dir = "./temp"
 #unitig_dir = "./unitigs"
 unitig_dir = "./unitigs_small"
 index_dir = "./index"
@@ -44,7 +44,7 @@ def drop_path_and_extension(S):
 def drop_extension(S):
     return os.path.splitext()[0]
 
-run("mkdir -p " + tempdir)
+run("mkdir -p " + temp_dir)
 run("mkdir -p " + unitig_dir)
 run("mkdir -p " + index_dir)
 

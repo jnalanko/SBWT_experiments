@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 #include "cxxopts.hpp"
-#include "BOSS.hh"
+#include "SBWT.hh"
+#include "variants.hh"
 #include "throwing_streams.hh"
 
 typedef long long LL;
 
 using namespace std;
+using namespace sbwt;
 
 const std::string generate_random_kmer(LL k) {
     std::string s;
@@ -37,19 +39,54 @@ const std::string generate_random_kmer(LL k) {
     return s;
 }
 
-vector<string> sample_random_kmers(const BOSS<sdsl::bit_vector>& wheelerboss, LL howmany){
-    vector<string> kmers;
-    for(LL i = 0; i < howmany; i++){
-        LL colex = rand() % wheelerboss.number_of_nodes();
-        string kmer = wheelerboss.get_node_label(colex);
-        while(kmer.size() != wheelerboss.get_k()){
-            // Dummy node. Try again.
-            colex = rand() % wheelerboss.number_of_nodes();
-            kmer = wheelerboss.get_node_label(colex);
+char incoming_label(sbwt::plain_matrix_sbwt_t& sbwt, int64_t column){
+    if(column < sbwt.get_C_array()[0]) return '$';
+    else if(column < sbwt.get_C_array()[1]) return 'A';
+    else if(column < sbwt.get_C_array()[2]) return 'C';
+    else if(column < sbwt.get_C_array()[3]) return 'G';
+    else return 'T';
+}
+
+vector<string> sample_random_kmers(sbwt::plain_matrix_sbwt_t& sbwt, LL howmany, string outfile){
+    cerr << "Building select supports" << endl;
+    vector<sdsl::select_support_mcl<>> select_supports(4);
+    sdsl::util::init_support(select_supports[0], &sbwt.get_subset_rank_structure().A_bits);
+    sdsl::util::init_support(select_supports[1], &sbwt.get_subset_rank_structure().C_bits);
+    sdsl::util::init_support(select_supports[2], &sbwt.get_subset_rank_structure().G_bits);
+    sdsl::util::init_support(select_supports[3], &sbwt.get_subset_rank_structure().T_bits);
+
+    cerr << "Sampling k-mers" << endl;
+    throwing_ofstream out(outfile);
+    LL k = sbwt.get_k();
+    const vector<int64_t>& C = sbwt.get_C_array();
+    while(true){
+        vector<char> label(k);
+        LL column = rand() % sbwt.number_of_subsets();
+        bool has_dollar = false;
+        for(LL j = 0; j < k; j++){
+            char c = incoming_label(sbwt, column);
+            label[k - 1 - j] = c;
+            if(c == '$'){
+                has_dollar = true;
+                continue;
+            }
+            if(c == 'A')
+                column = select_supports[0].select(column - C[0] + 1);
+            if(c == 'C')
+                column = select_supports[1].select(column - C[1] + 1);
+            if(c == 'G')
+                column = select_supports[2].select(column - C[2] + 1);
+            if(c == 'T')
+                column = select_supports[3].select(column - C[3] + 1);
         }
-        kmers.push_back(kmer);
+
+        if(!has_dollar){
+            // Write out the label as a FASTA sequence
+            out.stream << ">\n";
+            for(char c : label) out.stream << c;
+            out.stream << "\n";
+        }
     }
-    return kmers;
 }
 
 int main(int argc, char** argv) {
@@ -77,35 +114,31 @@ int main(int argc, char** argv) {
     LL howmany = opts["howmany"].as<LL>();
     LL k = opts["k"].as<LL>();
 
-    throwing_ofstream out(out_file);
+    plain_matrix_sbwt_t sbwt;
+    sbwt::throwing_ifstream in(index_file, ios::binary);
+    string variant_on_disk = sbwt::load_string(in.stream); // read variant type
+    if(variant_on_disk != "plain-matrix"){
+        cerr << "Error input is not a plain-matrix SBWT." << endl;
+        return 1;
+    }
+  
+    sbwt.load(in.stream);
 
-    if(tdbg_file == ""){
+    sbwt::throwing_ofstream out(index_file, ios::binary);
+    if(index_file == ""){
         if(k == -1){
             cerr << "k not given" << endl;
             return 1;
         }
         for (int i = 0; i < howmany; ++i) {
-            if(!no_headers) cout << ">" << i << "\n";
-            out << generate_random_kmer(k) << '\n';
+            cout << ">" << i << "\n";
+            out.stream << generate_random_kmer(k) << '\n';
         }
     } else{
         if(k != -1){
-            cerr << "If you give a .tdbg file, do not give k because the k is in the .tdbg." << endl;
+            cerr << "If you give an index file, do not give k because the k is in the index." << endl;
             exit(1);
         }
-        BOSS<sdsl::bit_vector> wheelerBOSS;
-        throwing_ifstream in(tdbg_file, ios::binary);
-        wheelerBOSS.load(in.stream);
-        for(LL i = 0; i < howmany; i++){
-            if(!no_headers) cout << ">" << i << "\n";
-            LL colex = rand() % wheelerBOSS.number_of_nodes();
-            string kmer = wheelerBOSS.get_node_label(colex);
-            while(kmer.size() != wheelerBOSS.get_k()){
-                // Dummy node. Try again.
-                colex = rand() % wheelerBOSS.number_of_nodes();
-                kmer = wheelerBOSS.get_node_label(colex);
-            }
-            out.stream << kmer << endl;
-        }
+        sample_random_kmers(sbwt, howmany, out_file);
     }
 }

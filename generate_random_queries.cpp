@@ -47,7 +47,7 @@ char incoming_label(sbwt::plain_matrix_sbwt_t& sbwt, int64_t column){
     else return 'T';
 }
 
-vector<string> sample_random_kmers(sbwt::plain_matrix_sbwt_t& sbwt, LL howmany, string outfile){
+void sample_random_kmers(sbwt::plain_matrix_sbwt_t& sbwt, LL howmany, string outfile){
     cerr << "Building select supports" << endl;
     vector<sdsl::select_support_mcl<>> select_supports(4);
     sdsl::util::init_support(select_supports[0], &sbwt.get_subset_rank_structure().A_bits);
@@ -58,6 +58,7 @@ vector<string> sample_random_kmers(sbwt::plain_matrix_sbwt_t& sbwt, LL howmany, 
     cerr << "Sampling k-mers" << endl;
     throwing_ofstream out(outfile);
     LL k = sbwt.get_k();
+    LL n_generated = 0;
     const vector<int64_t>& C = sbwt.get_C_array();
     while(true){
         vector<char> label(k);
@@ -85,6 +86,8 @@ vector<string> sample_random_kmers(sbwt::plain_matrix_sbwt_t& sbwt, LL howmany, 
             out.stream << ">\n";
             for(char c : label) out.stream << c;
             out.stream << "\n";
+            n_generated++;
+            if(n_generated == howmany) return;
         }
     }
 }
@@ -124,7 +127,7 @@ int main(int argc, char** argv) {
   
     sbwt.load(in.stream);
 
-    sbwt::throwing_ofstream out(index_file, ios::binary);
+    sbwt::throwing_ofstream out(out_file, ios::binary);
     if(index_file == ""){
         if(k == -1){
             cerr << "k not given" << endl;

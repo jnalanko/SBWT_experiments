@@ -36,20 +36,30 @@ print(datasets)  # Defined in setup.py
 variants = ["plain-matrix", "rrr-matrix", "mef-matrix", "plain-split", "rrr-split","mef-split", "plain-concat", "mef-concat", "plain-subsetwt", "rrr-subsetwt"]
 times = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
 mems = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
-
+streaming_times = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
+streaming_mems = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
 
 for variant in variants:
     for D in datasets:
         f = datasets[D]
 
         pos_file = query_dir + "/" + D + ".pos." + variant + ".sbwt.log"
-        neg_file = query_dir + "/" + D + ".pos." + variant + ".sbwt.log"
+        neg_file = query_dir + "/" + D + ".neg." + variant + ".sbwt.log"
+        streaming_pos_file = query_dir + "/" + D + ".streaming.pos." + variant + ".sbwt.log"
+        streaming_neg_file = query_dir + "/" + D + ".streaming.neg." + variant + ".sbwt.log"
 
         total_time_pos, mem_bytes_pos = parse_usr_bin_time(pos_file)
         time_us_pos = parse_us_per_query(pos_file) 
 
         total_time_neg, mem_bytes_neg = parse_usr_bin_time(neg_file)
         time_us_neg = parse_us_per_query(neg_file) 
+        
+        total_streaming_time_pos, mem_streaming_bytes_pos = parse_usr_bin_time(streaming_pos_file)
+        time_streaming_us_pos = parse_us_per_query(streaming_pos_file) 
+
+        total_streaming_time_neg, mem_streaming_bytes_neg = parse_usr_bin_time(streaming_neg_file)
+        time_streaming_us_neg = parse_us_per_query(streaming_neg_file) 
+        
 
         times[variant][D]["+"] = time_us_pos
         mems[variant][D]["+"] = mem_bytes_pos
@@ -57,17 +67,39 @@ for variant in variants:
         times[variant][D]["-"] = time_us_neg
         mems[variant][D]["-"] = mem_bytes_neg
 
-print("")
-print("Covid")
-for variant in variants:
-    print(variant, times[variant]["covid"]["+"], mems[variant]["covid"]["-"])
+        streaming_times[variant][D]["+"] = time_streaming_us_pos
+        streaming_mems[variant][D]["+"] = mem_streaming_bytes_pos
+
+        streaming_times[variant][D]["-"] = time_streaming_us_neg
+        streaming_mems[variant][D]["-"] = mem_streaming_bytes_neg
 
 print("")
-print("Ecoli")
+print("Covid single")
 for variant in variants:
-    print(variant, times[variant]["ecoli"]["+"], mems[variant]["ecoli"]["-"])
+    print(variant, times[variant]["covid"]["+"], times[variant]["covid"]["-"])
 
 print("")
-print("Metagenome")
+print("Ecoli single")
 for variant in variants:
-    print(variant, times[variant]["metagenome"]["+"], mems[variant]["metagenome"]["-"])
+    print(variant, times[variant]["ecoli"]["+"], times[variant]["ecoli"]["-"])
+
+print("")
+print("Metagenome single")
+for variant in variants:
+    print(variant, times[variant]["metagenome"]["+"], times[variant]["metagenome"]["-"])
+
+
+print("")
+print("Covid streaming")
+for variant in variants:
+    print(variant, streaming_times[variant]["covid"]["+"], streaming_times[variant]["covid"]["-"])
+
+print("")
+print("Ecoli streaming")
+for variant in variants:
+    print(variant, streaming_times[variant]["ecoli"]["+"], streaming_times[variant]["ecoli"]["-"])
+
+print("")
+print("Metagenome streaming")
+for variant in variants:
+    print(variant, streaming_times[variant]["metagenome"]["+"], streaming_times[variant]["metagenome"]["-"])

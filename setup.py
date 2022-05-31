@@ -9,7 +9,7 @@ from multiprocessing import Pool
 
 datasets = {"covid": "~/data/covid/ncbi_dataset/data/genomic.fna",
             "ecoli": "~/data/coli3682_concat.fasta",
-            "metagenome": "~/data/covid/ncbi_dataset/data/ERR5035349.fastq"}
+            "metagenome": "~/data/ERR5035349.fastq"}
 
 #datasets = {"covid": "./smalldata/1.fna",
 #            "ecoli": "./smalldata/2.fna",
@@ -39,6 +39,9 @@ def run(command):
 
 def drop_path_and_extension(S):
     return os.path.splitext(os.path.split(S)[1])[0]
+
+def drop_extension(S):
+    return os.path.splitext()[0]
 
 run("mkdir -p " + tempdir)
 run("mkdir -p " + unitig_dir)

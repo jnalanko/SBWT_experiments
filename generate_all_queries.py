@@ -2,22 +2,42 @@ from setup import *
 import sys
 
 if "--small" in sys.argv:
-    n_queries = 10
+    n_single_queries = 10
 else:
-    n_queries = 10**6
+    n_single_queries = 10**6
+
+if "--small" in sys.argv:
+    n_streaming_queries = 10
+    streaming_length = 40
+else:
+    n_streaming_queries = 10**5
+    streaming_length = 500
+
+
 
 for D in datasets:
-    f = datasets[D]
 
-    # Positive queries
-    run("./generate_random_queries -i {} -o {} -n {}".format(
+    # Positive single k-mer queries
+    run("./generate_queries -i {} -o {} -n {}".format(
           index_dir + "/" + D + ".plain-matrix.sbwt",
           query_dir + "/" + D + ".pos.fna",
-          n_queries))
+          n_single_queries))
 
-    # Negative queries
-    run("./generate_random_queries -o {} -n {} -k {}".format(
+    # Negative single k-mer queries (uniformly random k-mers)
+    run("./generate_queries -o {} -n {} -k {}".format(
           query_dir + "/" + D + ".neg.fna",
-          n_queries,
+          n_single_queries,
           k))
 
+    # Positive long queries (for streaming)
+    run("./generate_queries -s {} -o {} -n {} -k {}".format(
+          datasets[D],
+          query_dir + "/" + D + ".streaming.pos.fna",
+          n_streaming_queries,
+          streaming_length))
+
+    # Negative long queries (uniformly random k-mers for large k)
+    run("./generate_queries -o {} -n {} -k {}".format(
+          query_dir + "/" + D + ".streaming.neg.fna",
+          n_streaming_queries,
+          streaming_length))

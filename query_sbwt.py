@@ -21,3 +21,17 @@ for D in datasets:
             index_dir + "/" + D + "." + variant + ".sbwt",
             query_dir + "/" + D + ".neg.fna",
             query_dir + "/" + D + ".neg." + variant + ".sbwt.log",))
+
+        # Streaming positive queries
+        run("/usr/bin/time --verbose ./SBWT/build/bin/sbwt search -o {} -i {} -q {} 2>&1 | tee {}".format(
+            query_dir + "/" + D + ".streaming.pos." + variant + ".sbwt.out",
+            index_dir + "/" + D + "." + variant + ".sbwt",
+            query_dir + "/" + D + ".streaming.pos.fna",
+            query_dir + "/" + D + ".streaming.pos." + variant + ".sbwt.log",))
+
+        # Steaming negative queries
+        run("/usr/bin/time --verbose ./SBWT/build/bin/sbwt search -o {} -i {} -q {} 2>&1 | tee {}".format(
+            query_dir + "/" + D + ".streaming.neg." + variant + ".sbwt.out",
+            index_dir + "/" + D + "." + variant + ".sbwt",
+            query_dir + "/" + D + ".streaming.neg.fna",
+            query_dir + "/" + D + ".streaming.neg." + variant + ".sbwt.log",))

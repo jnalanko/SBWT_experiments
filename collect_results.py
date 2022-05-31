@@ -56,7 +56,7 @@ for variant in variants:
 
         times[variant][D]["-"] = time_us_neg
         mems[variant][D]["-"] = mem_bytes_neg
-        
+
 print("")
 print("Covid")
 for variant in variants:
@@ -70,4 +70,4 @@ for variant in variants:
 print("")
 print("Metagenome")
 for variant in variants:
-    print(variant, times[variant]["metagenome"]["+"], times[variant]["covid"]["-"])
+    print(variant, times[variant]["metagenome"]["+"], times[variant]["metagenome"]["-"])

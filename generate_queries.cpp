@@ -136,8 +136,15 @@ int main(int argc, char** argv) {
         while(howmany > 0){
             const string& seq = seqs[rand() % seqs.size()];
             if(seq.size() < k) continue; // Too short
+
             LL start = rand() % (seq.size() - k + 1);
-            out.stream << ">\n" << seq.substr(start,k) << "\n";
+            string S = seq.substr(start,k);
+
+            bool is_good = true;
+            for(char c : seq) if(c != 'A' && c != 'C' && c != 'G' && c != 'T') is_good = false;
+            if(!is_good) continue; // Has a non-ACGT character -> don't take.
+
+            out.stream << ">\n" << S << "\n";
             howmany--;
         }
     }

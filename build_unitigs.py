@@ -21,6 +21,7 @@ def run_bcalm():
         logfile = unitig_dir + "/" + D + ".bcalm.log"
         run("/usr/bin/time --verbose bcalm/build/bcalm -in {} -kmer-size {} -abundance-min 1 -nb-cores {} -out {} 2>&1 | tee {}".format(
              f, k, n_threads, unitig_dir + "/" + D, logfile, logfile))
+        run("rm {}/*.glue*".format(unitig_dir))
 
 run_bcalm()
 

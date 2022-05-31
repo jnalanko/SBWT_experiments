@@ -12,7 +12,7 @@ typedef long long LL;
 using namespace std;
 using namespace sbwt;
 
-const std::string generate_random_kmer(LL k) {
+std::string generate_random_kmer(LL k) {
     std::string s;
 
     for (int i = 0; i < k; ++i) {
@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
 
     options.add_options()
         ("o,out-file", "Output filename.", cxxopts::value<string>())
-        ("i,index-file", "The plain-matrix SBWT index. If this is given, the -k option must be given", cxxopts::value<string>()->default_value(""))
+        ("i,index-file", "The plain-matrix SBWT index. If not given, uniform random k-mers are generated. If this is given, the -k option must be given", cxxopts::value<string>()->default_value(""))
         ("n,howmany", "Number of k-mers to generate", cxxopts::value<LL>())
         ("k", "The k of the k-mers. Needed if dbg-file is not given.", cxxopts::value<LL>()->default_value("-1"))
         ("h,help", "Print usage")
@@ -117,17 +117,7 @@ int main(int argc, char** argv) {
     string index_file = opts["index-file"].as<string>();
     LL howmany = opts["howmany"].as<LL>();
     LL k = opts["k"].as<LL>();
-
-    plain_matrix_sbwt_t sbwt;
-    sbwt::throwing_ifstream in(index_file, ios::binary);
-    string variant_on_disk = sbwt::load_string(in.stream); // read variant type
-    if(variant_on_disk != "plain-matrix"){
-        cerr << "Error input is not a plain-matrix SBWT." << endl;
-        return 1;
-    }
   
-    sbwt.load(in.stream);
-
     sbwt::throwing_ofstream out(out_file, ios::binary);
     if(index_file == ""){
         if(k == -1){
@@ -135,7 +125,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         for (int i = 0; i < howmany; ++i) {
-            cout << ">" << i << "\n";
+            out.stream << ">" << i << "\n";
             out.stream << generate_random_kmer(k) << '\n';
         }
     } else{
@@ -143,6 +133,15 @@ int main(int argc, char** argv) {
             cerr << "If you give an index file, do not give k because the k is in the index." << endl;
             exit(1);
         }
+
+        sbwt::throwing_ifstream in(index_file, ios::binary);
+        string variant_on_disk = sbwt::load_string(in.stream); // read variant type
+        if(variant_on_disk != "plain-matrix"){
+            cerr << "Error input is not a plain-matrix SBWT." << endl;
+            return 1;
+        }
+        plain_matrix_sbwt_t sbwt;
+        sbwt.load(in.stream);
         sample_random_kmers(sbwt, howmany, out_file);
     }
 }

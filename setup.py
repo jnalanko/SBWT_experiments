@@ -13,13 +13,14 @@ if "--small" in sys.argv:
                 "metagenome": "./smalldata/3.fna"}
     unitig_dir = "./unitigs_small"
     index_dir = "./index_small"
+    query_dir = "./query_small"
 else:
     datasets = {"covid": "~/data/covid/ncbi_dataset/data/genomic.fna",
                 "ecoli": "~/data/coli3682_concat.fasta",
                 "metagenome": "~/data/ERR5035349.fastq"}
     unitig_dir = "./unitigs"
     index_dir = "./index"
-
+    query_dir = "./query"
 
 k = 31
 n_threads = 8
@@ -51,4 +52,5 @@ def drop_extension(S):
 run("mkdir -p " + temp_dir)
 run("mkdir -p " + unitig_dir)
 run("mkdir -p " + index_dir)
+run("mkdir -p " + query_dir)
 

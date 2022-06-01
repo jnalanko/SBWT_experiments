@@ -16,3 +16,6 @@
 [submodule "bifrost"]
 	path = bifrost
 	url = https://github.com/jnalanko/bifrost
+[submodule "cosmo"]
+	path = cosmo
+	url = https://github.com/cosmo-team/cosmo/

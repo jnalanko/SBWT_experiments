@@ -5,7 +5,7 @@ SIZE="--large"
 
 python3 build_unitigs.py $SIZE # requires bcalm or cuttlefish
 python3 stitch_unitigs.py $SIZE # requires ust
-python3 build_sbwt.py $SIZE # requires sbwt
+python3 build_sbwt.py $SIZE # requires sbwt with a modification that prints quey time
 python3 build_bifrost.py $SIZE # requires bifrost with a modification that prints query time
 python3 build_sshash.py $SIZE # requires sshash
 python3 generate_all_queries.py $SIZE # requires running compile.sh

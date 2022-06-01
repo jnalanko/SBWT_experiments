@@ -8,12 +8,12 @@ def parse_us_per_query_sbwt(logfile):
 
 def parse_us_per_query_sshash(logfile):
     for line in open(logfile):
-        if "Total query time ns/kmer without I/O:" in line:
+        if "Total query time us/kmer without I/O:" in line:
             return float(line.split()[-1])
 
 def parse_us_per_query_bifrost(logfile):
     for line in open(logfile):
-        if "Total query time ns/kmer without I/O:" in line:
+        if "Total query time us/kmer without I/O:" in line:
             return float(line.split()[-1])
 
 

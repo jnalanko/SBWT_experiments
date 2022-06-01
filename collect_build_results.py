@@ -26,12 +26,16 @@ for D in datasets:
     # sshash
     logfile = index_dir + "/" + D + ".sshash.log"
     time, rss = parse_usr_bin_time(logfile)
-    times["sshash"][D] = time
-    mems["sshash"][D] = rss
+    logfile = unitig_dir + "/" + D + ".bcalm.log"
+    time_bc, rss_bc = parse_usr_bin_time(logfile) # Including BCALM time
+    logfile = unitig_dir + "/" + D + ".ust.log"
+    time_ust, rss_ust = parse_usr_bin_time(logfile) # Including UST time
+    times["sshash"][D] = time + time_bc + time_ust
+    mems["sshash"][D] = max(rss, rss_bc, time_ust)
 
     # bifrost
     logfile = index_dir + "/" + D + ".bifrost.log"
-    time_plain, rss_plain = parse_usr_bin_time(logfile)
+    time, rss = parse_usr_bin_time(logfile)
     times["bifrost"][D] = time
     mems["bifrost"][D] = rss
 

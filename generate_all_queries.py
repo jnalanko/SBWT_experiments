@@ -18,24 +18,24 @@ for D in datasets:
     # Positive single k-mer queries
     run("./generate_queries -i {} -o {} -n {}".format(
           index_dir + "/" + D + ".plain-matrix.sbwt",
-          query_dir + "/" + D + ".pos.fna",
+          query_dir + "/" + D + ".pos.fa",
           n_single_queries))
 
     # Negative single k-mer queries (uniformly random k-mers)
     run("./generate_queries -o {} -n {} -k {}".format(
-          query_dir + "/" + D + ".neg.fna",
+          query_dir + "/" + D + ".neg.fa",
           n_single_queries,
           k))
 
     # Positive long queries (for streaming)
     run("./generate_queries -s {} -o {} -n {} -k {}".format(
           datasets[D],
-          query_dir + "/" + D + ".streaming.pos.fna",
+          query_dir + "/" + D + ".streaming.pos.fa",
           n_streaming_queries,
           streaming_length))
 
     # Negative long queries (uniformly random k-mers for large k)
     run("./generate_queries -o {} -n {} -k {}".format(
-          query_dir + "/" + D + ".streaming.neg.fna",
+          query_dir + "/" + D + ".streaming.neg.fa",
           n_streaming_queries,
           streaming_length))

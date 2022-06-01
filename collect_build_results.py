@@ -12,7 +12,7 @@ for D in datasets:
     # SBWT variants
     for variant in variants:
         logfile = index_dir + "/" + D + "." + variant + ".log"
-        rss, time = parse_usr_bin_time(logfile)
+        time, rss = parse_usr_bin_time(logfile)
 
         if variant != "plain-matrix":
             # Since we are building through plain matrix, we need to include the time and memory for that

@@ -1,7 +1,7 @@
 set -xue
 
-#SIZE="--small"
-SIZE="--large"
+SIZE="--small"
+#SIZE="--large"
 
 python3 build_unitigs.py $SIZE # requires bcalm or cuttlefish
 python3 stitch_unitigs.py $SIZE # requires ust

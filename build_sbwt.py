@@ -6,7 +6,7 @@ variants = ["rrr-matrix", "mef-matrix", "plain-split", "rrr-split", "mef-split",
 
 for D in datasets:
     f = datasets[D]
-    logfile = index_dir + "/" + D + ".plain-matrix.sbwt.log"
+    logfile = index_dir + "/" + D + ".plain-matrix.log"
     run("/usr/bin/time --verbose ./SBWT/build/bin/sbwt build -i {} -o {} -k {} --add-reverse-complements -t {} -m {} --temp-dir {}  2>&1 | tee {}".format(
           f, 
           index_dir + "/" + D + ".plain-matrix.sbwt", 

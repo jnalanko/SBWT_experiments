@@ -11,7 +11,7 @@ sizes = defaultdict(lambda: defaultdict(int)) # tool -> dataset -> final size on
 for D in datasets:
     # SBWT variants
     for variant in variants:
-        logfile = index_dir + "/" + D + "." + variant + ".sbwt.log"
+        logfile = index_dir + "/" + D + "." + variant + ".log"
         rss, time = parse_usr_bin_time(logfile)
         times[variant][D] = time
         mems[variant][D] = rss

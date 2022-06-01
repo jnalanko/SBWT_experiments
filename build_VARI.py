@@ -10,10 +10,18 @@ from setup import *
 for D in datasets:
     f = datasets[D]
 
-    run("/usr/bin/time --verbose ./KMC/bin/kmc -ci0 {} -k{} {} {} {}  2>&1 | tee {}".format(
+    # Create reverse complement file (not timed)
+    rc_file_name = temp_dir + "/" + D + "_rc" + (".fq" if D == "metagenome" else ".fna")
+    run("./SeqIO/rc_file {} {}".format(f, rc_file_name))
+
+    # Create input list for KMC
+    run("echo {} > {}".format(f, temp_dir + "/kmc_input_list.txt"))
+    run("echo {} >> {}".format(rc_file_name, temp_dir + "/kmc_input_list.txt"))
+
+    run("/usr/bin/time --verbose ./KMC/bin/kmc -b -ci0 {} -k{} @{} {} {}  2>&1 | tee {}".format(
           "-fq" if D == "metagenome" else "-fm", # Metagenome is in fastq format, others in multi-fasta
           k, 
-          f,
+          temp_dir + "/kmc_input_list.txt",
           temp_dir + "/kmc1",
           temp_dir,
           index_dir + "/" + D + ".kmc1.log"
@@ -35,3 +43,5 @@ for D in datasets:
         index_dir + "/" + D + ".", # Vari adds suffix vari_list.dbg
         index_dir + "/" + D + ".vari.log"
     ))
+
+    run("rm " + rc_file_name) # Clean up

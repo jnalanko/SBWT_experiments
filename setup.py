@@ -10,7 +10,7 @@ from multiprocessing import Pool
 if "--small" in sys.argv:
     datasets = {"covid": "./smalldata/1.fna",
                 "ecoli": "./smalldata/2.fna",
-                "metagenome": "./smalldata/3.fna"}
+                "metagenome": "./smalldata/3.fq"}
     unitig_dir = "./unitigs_small"
     index_dir = "./index_small"
     query_dir = "./query_small"

@@ -19,3 +19,6 @@
 [submodule "cosmo"]
 	path = cosmo
 	url = https://github.com/cosmo-team/cosmo/
+[submodule "KMC"]
+	path = KMC
+	url = https://github.com/refresh-bio/KMC

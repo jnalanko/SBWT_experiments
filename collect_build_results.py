@@ -32,18 +32,30 @@ for D in datasets:
 ls = run_get_output("ls -l index")
 for line in ls.split("\n")[1:]:
 
-    # sbwt
-    if line.split()[-1].split(".")[-1] in [".sbwt", ".sshash", ".gfa"]:
+    if line.split()[-1].split(".")[-1] in ["sbwt", "sshash", "gfa"]:
+        print("hi")
         size = line.split()[4]
         filename = line.split()[-1]
         dataset = filename.split(".")[0]
         method = filename.split(".")[1]
         sizes[method][dataset] = size
 
-print(times)
-print(mems)
-print(sizes)
-        
+
+print("")
+print("Covid")
+for variant in (variants + ["sshash", "bifrost"]):
+    print(variant, times[variant]["covid"], mems[variant]["covid"], sizes[variant]["covid"])
+
+print("")
+print("Ecoli")
+for variant in (variants + ["sshash", "bifrost"]):
+    print(variant, times[variant]["ecoli"], mems[variant]["ecoli"], sizes[variant]["ecoli"])
+
+print("")
+print("Metagenome")
+for variant in (variants + ["sshash", "bifrost"]):
+    print(variant, times[variant]["metagenome"], mems[variant]["metagenome"], sizes[variant]["metagenome"])
+
 
         
 

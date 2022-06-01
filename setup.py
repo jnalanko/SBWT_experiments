@@ -49,6 +49,31 @@ def drop_path_and_extension(S):
 def drop_extension(S):
     return os.path.splitext()[0]
 
+# Returns pair (time seconds, RSS bytes)
+def parse_usr_bin_time(stderr_file):
+    rss, time = None, None
+    for line in open(stderr_file):
+        if "Maximum resident set size (kbytes)" in line:
+            rss = int(line.split()[-1]) * 2**10 # bytes
+        if "Elapsed (wall clock) time (h:mm:ss or m:ss)" in line:
+            token = line.split()[-1]
+            hours, minutes, seconds = 0,0,0
+            if token.count(":") == 1:
+                minutes = float(token.split(":")[0])
+                seconds = float(token.split(":")[1])
+            elif token.count(":") == 2:
+                hours = float(token.split(":")[0])
+                minutes = float(token.split(":")[1])
+                seconds = float(token.split(":")[2])
+            else:
+                print("Error parsing /usr/time/time -v")
+                assert(False)
+            time = hours * 60*60 + minutes * 60 + seconds
+    if rss == None or time == None:
+        print("Error parsing /usr/time/time -v from " + stderr_file)
+        assert(False)
+    return time, rss
+
 run("mkdir -p " + temp_dir)
 run("mkdir -p " + unitig_dir)
 run("mkdir -p " + index_dir)

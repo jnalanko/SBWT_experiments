@@ -1,31 +1,6 @@
 from setup import *
 from collections import defaultdict
 
-# Returns pair (time seconds, RSS bytes)
-def parse_usr_bin_time(stderr_file):
-    rss, time = None, None
-    for line in open(stderr_file):
-        if "Maximum resident set size (kbytes)" in line:
-            rss = int(line.split()[-1]) * 2**10 # bytes
-        if "Elapsed (wall clock) time (h:mm:ss or m:ss)" in line:
-            token = line.split()[-1]
-            hours, minutes, seconds = 0,0,0
-            if token.count(":") == 1:
-                minutes = float(token.split(":")[0])
-                seconds = float(token.split(":")[1])
-            elif token.count(":") == 2:
-                hours = float(token.split(":")[0])
-                minutes = float(token.split(":")[1])
-                seconds = float(token.split(":")[2])
-            else:
-                print("Error parsing /usr/time/time -v")
-                assert(False)
-            time = hours * 60*60 + minutes * 60 + seconds
-    if rss == None or time == None:
-        print("Error parsing /usr/time/time -v from " + stderr_file)
-        assert(False)
-    return time, rss
-
 def parse_us_per_query_sbwt(logfile):
     for line in open(logfile):
         if "us/query" in line and "excluding I/O etc" in line:

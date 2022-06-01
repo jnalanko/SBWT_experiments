@@ -13,18 +13,25 @@ for D in datasets:
     for variant in variants:
         logfile = index_dir + "/" + D + "." + variant + ".log"
         rss, time = parse_usr_bin_time(logfile)
+
+        if variant != "plain-matrix":
+            # Since we are building through plain matrix, we need to include the time and memory for that
+            time_plain, rss_plain = parse_usr_bin_time(index_dir + "/" + D + ".plain-matrix.log")
+            rss = max(rss, rss_plain)
+            time += time_plain 
+
         times[variant][D] = time
         mems[variant][D] = rss
 
     # sshash
     logfile = index_dir + "/" + D + ".sshash.log"
-    rss, time = parse_usr_bin_time(logfile)
+    time, rss = parse_usr_bin_time(logfile)
     times["sshash"][D] = time
     mems["sshash"][D] = rss
 
     # bifrost
     logfile = index_dir + "/" + D + ".bifrost.log"
-    rss, time = parse_usr_bin_time(logfile)
+    time_plain, rss_plain = parse_usr_bin_time(logfile)
     times["bifrost"][D] = time
     mems["bifrost"][D] = rss
 
@@ -33,7 +40,6 @@ ls = run_get_output("ls -l index")
 for line in ls.split("\n")[1:]:
 
     if line.split()[-1].split(".")[-1] in ["sbwt", "sshash", "gfa"]:
-        print("hi")
         size = line.split()[4]
         filename = line.split()[-1]
         dataset = filename.split(".")[0]

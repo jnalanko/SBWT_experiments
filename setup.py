@@ -26,6 +26,8 @@ k = 31
 n_threads = 8
 temp_dir = "./temp"
 
+my_env = os.environ.copy()
+my_env["LD_LIBRARY_PATH"] = "cosmo/3rd_party_inst/boost/lib/:" + my_env["LD_LIBRARY_PATH"]
 
 if sys.version_info < (3, 0):
     sys.stdout.write("Error: Python3 required\n")
@@ -34,11 +36,11 @@ if sys.version_info < (3, 0):
 def run_get_output(command):
     # Command can have pipes
     sys.stderr.write(command + "\n")
-    return subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8").strip()
+    return subprocess.run(command, shell=True, stdout=subprocess.PIPE, env=my_env).stdout.decode("utf-8").strip()
 
 def run(command):
     sys.stderr.write(command + "\n")
-    completed = subprocess.run(command, shell=True)
+    completed = subprocess.run(command, shell=True, env=my_env)
     if completed.returncode != 0:
         print("Error: nonzero return code for command: " + command)
         sys.exit(1)

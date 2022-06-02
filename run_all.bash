@@ -1,7 +1,7 @@
 set -xue
 
-#SIZE="--small"
-SIZE="--large"
+SIZE="--small"
+#SIZE="--large"
 
 python3 build_VARI.py $SIZE # requires VARI-merge and A LOT OF DISK.
 python3 build_unitigs.py $SIZE # requires bcalm or cuttlefish

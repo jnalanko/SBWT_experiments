@@ -23,14 +23,21 @@ def print_table(dataset):
         size_no_rc = (sizes[variant + "-no-rc"][dataset]*8 - streaming_overhead_no_rc) / kmers
         print(variant, 
             "& {} & {}".format(int(times[variant][dataset]), int(times[variant + "-no-rc"][dataset])),  # Seconds
-            "& {:.3g} & {:.3g}".format(mems[variant][dataset] / 2**30, mems[variant + "-no-rc"][dataset] / 2**30), # GB
-            "& {:.3g} & {:.3g} \\\\".format(size_rc, size_no_rc)) # bits / kmer
+            "& {:.2f} & {:.2f}".format(mems[variant][dataset] / 2**30, mems[variant + "-no-rc"][dataset] / 2**30), # GB
+            "& {:.2f} & {:.2f} \\\\".format(size_rc, size_no_rc)) # bits / kmer
 
-    for variant in ["sshash", "bifrost","vari"]: 
+    for variant in ["sshash", "bifrost"]: 
         print(variant, 
             "& {} & ".format(int(times[variant][dataset])),  # Seconds
-            "& {:.3g} & ".format(mems[variant][dataset] / 2**30), # GB
-            "& {:.3g} & \\\\".format(sizes[variant][dataset]*8 / kmers)) # bits / kmer
+            "& {:.2f} & ".format(mems[variant][dataset] / 2**30), # GB
+            "& {:.2f} & \\\\".format(sizes[variant][dataset]*8 / kmers)) # bits / kmer
+
+    for variant in ["vari"]: 
+        print(variant, 
+            "& & {} ".format(int(times[variant][dataset])),  # Seconds
+            "& & {:.2f} ".format(mems[variant][dataset] / 2**30), # GB
+            "& & {:.2f} \\\\".format(sizes[variant][dataset]*8 / kmers)) # bits / kmer
+
 
 variants = ["plain-matrix", "rrr-matrix", "mef-matrix", "plain-split", "rrr-split","mef-split", "plain-concat", "mef-concat", "plain-subsetwt", "rrr-subsetwt"]
 variants_both = variants + [x + "-no-rc" for x in variants] # Add no-reverse-complement versions
@@ -75,10 +82,11 @@ for D in datasets:
     mems["bifrost"][D] = rss
 
     # VARI
-    logfile = index_dir + "/" + D + ".vari.log"
-    time, rss = parse_usr_bin_time(logfile)
-    times["vari"][D] = time
-    mems["vari"][D] = rss
+    time1, rss1 = parse_usr_bin_time(index_dir + "/" + D + ".kmc1.log")
+    time2, rss2 = parse_usr_bin_time(index_dir + "/" + D + ".kmc2.log")
+    time3, rss3 = parse_usr_bin_time(index_dir + "/" + D + ".vari.log")
+    times["vari"][D] = time1 + time2 + time3
+    mems["vari"][D] = max(rss1, rss2, rss3)
 
 # Get sizes on disk
 ls = run_get_output("ls -l index")

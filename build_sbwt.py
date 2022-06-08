@@ -6,12 +6,12 @@ variants = ["rrr-matrix", "mef-matrix", "plain-split", "rrr-split", "mef-split",
 
 for D in datasets:
     f = datasets[D]
-    logfile = index_dir + "/" + D + ".plain-matrix.log"
 
     if D == "covid": mem_gigas = 5
     if D == "ecoli": mem_gigas = 5
     if D == "metagenome": mem_gigas = 9
 
+    # With rc
     run("/usr/bin/time --verbose ./SBWT/build/bin/sbwt build -i {} -o {} -k {} --add-reverse-complements -t {} -m {} --temp-dir {}  2>&1 | tee {}".format(
           f, 
           index_dir + "/" + D + ".plain-matrix.sbwt", 
@@ -19,14 +19,31 @@ for D in datasets:
           n_threads, 
           mem_gigas,
           temp_dir,
-          logfile))
+          index_dir + "/" + D + ".plain-matrix.log"))
+    # With rc
+    run("/usr/bin/time --verbose ./SBWT/build/bin/sbwt build -i {} -o {} -k {} -t {} -m {} --temp-dir {}  2>&1 | tee {}".format(
+          f, 
+          index_dir + "/" + D + ".plain-matrix-no-rc.sbwt", 
+          k, 
+          n_threads, 
+          mem_gigas,
+          temp_dir,
+          index_dir + "/" + D + ".plain-matrix-no-rc.log"))
+
 
     # Build variants
     for variant in variants:
-        logfile = index_dir + "/" + D + "." + variant + ".log"
+
+        # rc
         run("/usr/bin/time --verbose ./SBWT/build/bin/sbwt build-variant -i {} -o {} --variant {} 2>&1 | tee {}".format(
               index_dir + "/" + D + ".plain-matrix.sbwt", 
               index_dir + "/" + D + "." + variant + ".sbwt", 
               variant,
-              logfile))
+              index_dir + "/" + D + "." + variant + ".log"))
 
+        # no rc
+        run("/usr/bin/time --verbose ./SBWT/build/bin/sbwt build-variant -i {} -o {} --variant {} 2>&1 | tee {}".format(
+              index_dir + "/" + D + ".plain-matrix-no-rc.sbwt", 
+              index_dir + "/" + D + "." + variant + "-no-rc.sbwt", 
+              variant,
+              index_dir + "/" + D + "." + variant + "-no-rc.log"))

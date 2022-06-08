@@ -21,16 +21,16 @@ def print_table(dataset):
     for variant in variants:
         size_rc = (sizes[variant][dataset]*8 - streaming_overhead_rc) / kmers
         size_no_rc = (sizes[variant + "-no-rc"][dataset]*8 - streaming_overhead_no_rc) / kmers
-        print("& " + variant, 
-            "& {} | {}".format(int(times[variant][dataset]), int(times[variant + "-no-rc"][dataset])),  # Seconds
-            "& {:.3g} | {:.3g}".format(mems[variant][dataset] / 2**30, mems[variant + "-no-rc"][dataset] / 2**30), # GB
-            "& {:.3g} | {:.3g}".format(size_rc, size_no_rc)) # bits / kmer
+        print(variant, 
+            "& {} & {}".format(int(times[variant][dataset]), int(times[variant + "-no-rc"][dataset])),  # Seconds
+            "& {:.3g} & {:.3g}".format(mems[variant][dataset] / 2**30, mems[variant + "-no-rc"][dataset] / 2**30), # GB
+            "& {:.3g} & {:.3g} \\\\".format(size_rc, size_no_rc)) # bits / kmer
 
-    for variant in ["sshash", "bifrost"]: 
-        print("& " + variant, 
-            "& {} ".format(int(times[variant][dataset])),  # Seconds
-            "& {:.3g} ".format(mems[variant][dataset] / 2**30), # GB
-            "& {:.3g} ".format(sizes[variant][dataset]*8 / kmers)) # bits / kmer
+    for variant in ["sshash", "bifrost","vari"]: 
+        print(variant, 
+            "& {} & ".format(int(times[variant][dataset])),  # Seconds
+            "& {:.3g} & ".format(mems[variant][dataset] / 2**30), # GB
+            "& {:.3g} & \\\\".format(sizes[variant][dataset]*8 / kmers)) # bits / kmer
 
 variants = ["plain-matrix", "rrr-matrix", "mef-matrix", "plain-split", "rrr-split","mef-split", "plain-concat", "mef-concat", "plain-subsetwt", "rrr-subsetwt"]
 variants_both = variants + [x + "-no-rc" for x in variants] # Add no-reverse-complement versions
@@ -74,14 +74,21 @@ for D in datasets:
     times["bifrost"][D] = time
     mems["bifrost"][D] = rss
 
+    # VARI
+    logfile = index_dir + "/" + D + ".vari.log"
+    time, rss = parse_usr_bin_time(logfile)
+    times["vari"][D] = time
+    mems["vari"][D] = rss
+
 # Get sizes on disk
 ls = run_get_output("ls -l index")
 for line in ls.split("\n")[1:]:
-    if line.split()[-1].split(".")[-1] in ["sbwt", "sshash", "gfa"]:
+    if line.split()[-1].split(".")[-1] in ["sbwt", "sshash", "gfa", "dbg"]:
         size = line.split()[4]
         filename = line.split()[-1]
         dataset = filename.split(".")[0]
         method = filename.split(".")[1]
+        if method == "vari_list": method = "vari" # Remove suffix _list added in construction
         sizes[method][dataset] = int(size)
 
 
@@ -93,12 +100,7 @@ print("")
 print("Ecoli")
 print_table("ecoli")
 
-
 print("")
 print("metagenome")
 print_table("metagenome")
-
-
-
-        
 

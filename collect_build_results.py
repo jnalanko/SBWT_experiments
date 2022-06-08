@@ -34,9 +34,9 @@ def print_table(dataset):
 
     for variant in ["vari"]: 
         print(variant, 
-            "& & {} ".format(int(times[variant][dataset])),  # Seconds
-            "& & {:.2f} ".format(mems[variant][dataset] / 2**30), # GB
-            "& & {:.2f} \\\\".format(sizes[variant][dataset]*8 / kmers)) # bits / kmer
+            "& {} & ".format(int(times[variant][dataset])),  # Seconds
+            "& {:.2f} & ".format(mems[variant][dataset] / 2**30), # GB
+            "& {:.2f} & \\\\".format(sizes[variant][dataset]*8 / kmers)) # bits / kmer
 
 
 variants = ["plain-matrix", "rrr-matrix", "mef-matrix", "plain-split", "rrr-split","mef-split", "plain-concat", "mef-concat", "plain-subsetwt", "rrr-subsetwt"]

@@ -16,6 +16,11 @@ def parse_us_per_query_bifrost(logfile):
         if "Total query time us/kmer without I/O:" in line:
             return float(line.split()[-1])
 
+def parse_us_per_query_vari(logfile):
+    for line in open(logfile):
+        if "Total query time us/kmer without I/O:" in line:
+            return float(line.split()[-1])
+
 
 print(datasets)  # Defined in setup.py
 
@@ -124,9 +129,41 @@ for D in datasets:
     streaming_times["bifrost"][D]["-"] = time_streaming_us_neg
     streaming_mems["bifrost"][D]["-"] = float(mem_streaming_bytes_neg) * 8 / kmers
 
+    # VARI
+
+    pos_file = query_dir + "/" + D + ".pos.vari.log"
+    neg_file = query_dir + "/" + D + ".neg.vari.log"
+    streaming_pos_file = query_dir + "/" + D + ".streaming.pos.vari.log"
+    streaming_neg_file = query_dir + "/" + D + ".streaming.neg.vari.log"
+
+    total_time_pos, mem_bytes_pos = parse_usr_bin_time(pos_file)
+    time_us_pos = parse_us_per_query_vari(pos_file) 
+
+    total_time_neg, mem_bytes_neg = parse_usr_bin_time(neg_file)
+    time_us_neg = parse_us_per_query_vari(neg_file) 
+    
+    total_streaming_time_pos, mem_streaming_bytes_pos = parse_usr_bin_time(streaming_pos_file)
+    time_streaming_us_pos = parse_us_per_query_vari(streaming_pos_file) 
+
+    total_streaming_time_neg, mem_streaming_bytes_neg = parse_usr_bin_time(streaming_neg_file)
+    time_streaming_us_neg = parse_us_per_query_vari(streaming_neg_file) 
+
+    times["vari"][D]["+"] = time_us_pos
+    mems["vari"][D]["+"] = float(mem_bytes_pos) * 8 / kmers
+
+    times["vari"][D]["-"] = time_us_neg
+    mems["vari"][D]["-"] = float(mem_bytes_neg) * 8 / kmers
+
+    streaming_times["vari"][D]["+"] = time_streaming_us_pos
+    streaming_mems["vari"][D]["+"] = float(mem_streaming_bytes_pos) * 8 / kmers
+
+    streaming_times["vari"][D]["-"] = time_streaming_us_neg
+    streaming_mems["vari"][D]["-"] = float(mem_streaming_bytes_neg) * 8 / kmers
+
+
 print("")
 print("Covid")
-for variant in (variants + ["sshash", "bifrost"]):
+for variant in (variants + ["sshash", "bifrost", "vari"]):
     print(variant + " &", 
           "{:.2f} &".format(times[variant]["covid"]["+"]),
           "{:.2f} &".format(times[variant]["covid"]["-"]),
@@ -137,7 +174,7 @@ for variant in (variants + ["sshash", "bifrost"]):
 
 print("")
 print("Ecoli")
-for variant in (variants + ["sshash", "bifrost"]):
+for variant in (variants + ["sshash", "bifrost", "vari"]):
     print(variant + " &", 
           "{:.2f} &".format(times[variant]["ecoli"]["+"]),
           "{:.2f} &".format(times[variant]["ecoli"]["-"]),
@@ -147,7 +184,7 @@ for variant in (variants + ["sshash", "bifrost"]):
           "{:.2f} \\\\".format(streaming_mems[variant]["ecoli"]["+"]))
 print("")
 print("Metagenome")
-for variant in (variants + ["sshash", "bifrost"]):
+for variant in (variants + ["sshash", "bifrost", "vari"]):
     print(variant + " &", 
           "{:.2f} &".format(times[variant]["metagenome"]["+"]),
           "{:.2f} &".format(times[variant]["metagenome"]["-"]),

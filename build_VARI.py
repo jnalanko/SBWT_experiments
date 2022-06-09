@@ -10,7 +10,7 @@ from setup import *
 for D in datasets:
     f = datasets[D]
 
-    run("/usr/bin/time --verbose ./KMC/bin/kmc -ci0 {} -k{} {} {} {}  2>&1 | tee {}".format(
+    run("/usr/bin/time --verbose ./KMC/bin/kmc -ci0 -cs2 {} -k{} {} {} {}  2>&1 | tee {}".format(
           "-fq" if D == "metagenome" else "-fm", # Metagenome is in fastq format, others in multi-fasta
           k, 
           f,
@@ -18,7 +18,6 @@ for D in datasets:
           temp_dir,
           index_dir + "/" + D + ".kmc1.log"
           ))
-
     run("/usr/bin/time --verbose ./KMC/bin/kmc_tools transform {} sort {} 2>&1 | tee {}".format(
           temp_dir + "/kmc1",
           temp_dir + "/kmc2",

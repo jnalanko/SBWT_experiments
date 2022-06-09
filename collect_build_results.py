@@ -1,18 +1,6 @@
 from setup import *
 from collections import defaultdict
 
-def parse_kmer_count(logfile):
-    for line in open(logfile):
-        if "Build SBWT for" in line and "distinct k-mers" in line:
-            return int(line.split()[-3])
-    assert(False) # Should not come here
-
-def parse_subset_count(logfile):
-    for line in open(logfile):
-        if "SBWT has " in line and "subsets" in line:
-            return int(line.split()[-2])
-    assert(False) # Should not come here
-
 def print_table(dataset):
     streaming_overhead_rc = parse_subset_count(index_dir + "/" + dataset + ".plain-matrix.log")
     streaming_overhead_no_rc = parse_subset_count(index_dir + "/" + dataset + ".plain-matrix-no-rc.log")

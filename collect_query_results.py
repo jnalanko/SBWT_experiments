@@ -21,12 +21,14 @@ print(datasets)  # Defined in setup.py
 
 variants = ["plain-matrix", "rrr-matrix", "mef-matrix", "plain-split", "rrr-split","mef-split", "plain-concat", "mef-concat", "plain-subsetwt", "rrr-subsetwt"]
 times = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
-mems = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
+mems = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> mem
 streaming_times = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
-streaming_mems = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> us/query
+streaming_mems = defaultdict(lambda: defaultdict(lambda: defaultdict(float))) # tool -> dataset -> pos/neg -> mem
 
 for D in datasets:
 
+    kmers = parse_kmer_count(index_dir + "/" + D + ".plain-matrix-no-rc.log") # Counting k-mers, not k-molecules
+    streaming_overhead = parse_subset_count(index_dir + "/" + D + ".plain-matrix.log")
     # SBWT variants
     for variant in variants:
         f = datasets[D]
@@ -49,16 +51,16 @@ for D in datasets:
         time_streaming_us_neg = parse_us_per_query_sbwt(streaming_neg_file) 
         
         times[variant][D]["+"] = time_us_pos
-        mems[variant][D]["+"] = mem_bytes_pos
+        mems[variant][D]["+"] = (float(mem_bytes_pos)*8 - streaming_overhead) / kmers # Subtract the streaming overhead becaues it's not need for single queries
 
         times[variant][D]["-"] = time_us_neg
-        mems[variant][D]["-"] = mem_bytes_neg
+        mems[variant][D]["-"] = (float(mem_bytes_neg)*8 - streaming_overhead) / kmers # Subtract the streaming overhead becaues it's not need for single queries
 
         streaming_times[variant][D]["+"] = time_streaming_us_pos
-        streaming_mems[variant][D]["+"] = mem_streaming_bytes_pos
+        streaming_mems[variant][D]["+"] = float(mem_streaming_bytes_pos)*8 / kmers
 
         streaming_times[variant][D]["-"] = time_streaming_us_neg
-        streaming_mems[variant][D]["-"] = mem_streaming_bytes_neg
+        streaming_mems[variant][D]["-"] = float(mem_streaming_bytes_neg)*8 / kmers
 
     # sshash
 
@@ -80,16 +82,16 @@ for D in datasets:
     time_streaming_us_neg = parse_us_per_query_sshash(streaming_neg_file) 
 
     times["sshash"][D]["+"] = time_us_pos
-    mems["sshash"][D]["+"] = mem_bytes_pos
+    mems["sshash"][D]["+"] = float(mem_bytes_pos) * 8 / kmers
 
     times["sshash"][D]["-"] = time_us_neg
-    mems["sshash"][D]["-"] = mem_bytes_neg
+    mems["sshash"][D]["-"] = float(mem_bytes_neg) * 8 / kmers
 
     streaming_times["sshash"][D]["+"] = time_streaming_us_pos
-    streaming_mems["sshash"][D]["+"] = mem_streaming_bytes_pos
+    streaming_mems["sshash"][D]["+"] = float(mem_streaming_bytes_pos) * 8 / kmers
 
     streaming_times["sshash"][D]["-"] = time_streaming_us_neg
-    streaming_mems["sshash"][D]["-"] = mem_streaming_bytes_neg
+    streaming_mems["sshash"][D]["-"] = float(mem_streaming_bytes_neg) * 8 / kmers
 
     # bifrost
 
@@ -111,44 +113,45 @@ for D in datasets:
     time_streaming_us_neg = parse_us_per_query_sshash(streaming_neg_file) 
 
     times["bifrost"][D]["+"] = time_us_pos
-    mems["bifrost"][D]["+"] = mem_bytes_pos
+    mems["bifrost"][D]["+"] = float(mem_bytes_pos) * 8 / kmers
 
     times["bifrost"][D]["-"] = time_us_neg
-    mems["bifrost"][D]["-"] = mem_bytes_neg
+    mems["bifrost"][D]["-"] = float(mem_bytes_neg) * 8 / kmers
 
     streaming_times["bifrost"][D]["+"] = time_streaming_us_pos
-    streaming_mems["bifrost"][D]["+"] = mem_streaming_bytes_pos
+    streaming_mems["bifrost"][D]["+"] = float(mem_streaming_bytes_pos) * 8 / kmers
 
     streaming_times["bifrost"][D]["-"] = time_streaming_us_neg
-    streaming_mems["bifrost"][D]["-"] = mem_streaming_bytes_neg
+    streaming_mems["bifrost"][D]["-"] = float(mem_streaming_bytes_neg) * 8 / kmers
 
 print("")
-print("Covid single")
+print("Covid")
 for variant in (variants + ["sshash", "bifrost"]):
-    print(variant, times[variant]["covid"]["+"], times[variant]["covid"]["-"])
+    print(variant + " &", 
+          "{:.2f} &".format(times[variant]["covid"]["+"]),
+          "{:.2f} &".format(times[variant]["covid"]["-"]),
+          "{:.2f} &".format(mems[variant]["covid"]["+"]),
+          "{:.2f} &".format(streaming_times[variant]["covid"]["+"]),
+          "{:.2f} &".format(streaming_times[variant]["covid"]["-"]),
+          "{:.2f} \\\\".format(streaming_mems[variant]["covid"]["+"]))
 
 print("")
-print("Ecoli single")
+print("Ecoli")
 for variant in (variants + ["sshash", "bifrost"]):
-    print(variant, times[variant]["ecoli"]["+"], times[variant]["ecoli"]["-"])
-
+    print(variant + " &", 
+          "{:.2f} &".format(times[variant]["ecoli"]["+"]),
+          "{:.2f} &".format(times[variant]["ecoli"]["-"]),
+          "{:.2f} &".format(mems[variant]["ecoli"]["+"]),
+          "{:.2f} &".format(streaming_times[variant]["ecoli"]["+"]),
+          "{:.2f} &".format(streaming_times[variant]["ecoli"]["-"]),
+          "{:.2f} \\\\".format(streaming_mems[variant]["ecoli"]["+"]))
 print("")
-print("Metagenome single")
+print("Metagenome")
 for variant in (variants + ["sshash", "bifrost"]):
-    print(variant, times[variant]["metagenome"]["+"], times[variant]["metagenome"]["-"])
-
-
-print("")
-print("Covid streaming")
-for variant in (variants + ["sshash", "bifrost"]):
-    print(variant, streaming_times[variant]["covid"]["+"], streaming_times[variant]["covid"]["-"])
-
-print("")
-print("Ecoli streaming")
-for variant in (variants + ["sshash", "bifrost"]):
-    print(variant, streaming_times[variant]["ecoli"]["+"], streaming_times[variant]["ecoli"]["-"])
-
-print("")
-print("Metagenome streaming")
-for variant in (variants + ["sshash", "bifrost"]):
-    print(variant, streaming_times[variant]["metagenome"]["+"], streaming_times[variant]["metagenome"]["-"])
+    print(variant + " &", 
+          "{:.2f} &".format(times[variant]["metagenome"]["+"]),
+          "{:.2f} &".format(times[variant]["metagenome"]["-"]),
+          "{:.2f} &".format(mems[variant]["metagenome"]["+"]),
+          "{:.2f} &".format(streaming_times[variant]["metagenome"]["+"]),
+          "{:.2f} &".format(streaming_times[variant]["metagenome"]["-"]),
+          "{:.2f} \\\\".format(streaming_mems[variant]["metagenome"]["+"]))
